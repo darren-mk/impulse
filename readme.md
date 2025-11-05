@@ -11,12 +11,15 @@
 
 - development
 ```shell
-npx @tailwindcss/cli -i ./src/input.css -o ./static/output.css --watch
-cargo watch -x run
+bash scripts/dev.sh
 ```
 
 - build
 ```shell
-pnpx @tailwindcss/cli -i ./src/input.css -o ./static/output.css --minify
-cargo build
+bash scripts/build.sh
+```
+
+- run build 
+```shell
+./target/release/impulse
 ```
