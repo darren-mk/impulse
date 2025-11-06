@@ -1,16 +1,14 @@
+mod constants;
+mod models;
+
 use dotenvy::dotenv;
 use axum::{extract::State, response::Html, routing::get, Router};
 use maud::{html, Markup};
 use tower_http::services::ServeDir;
-use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
+use sqlx::{postgres::PgPoolOptions};
 use std::{env, time::Duration};
-
-const PORT_NUM: &str = "0.0.0.0:3000";
-const DATASTAR_SRC: &str = "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js";
-
-#[derive(Clone)]
-struct AppState {
-    pool: Pool<Postgres> }
+use constants::{PORT_NUM, DATASTAR_SRC};
+use models::AppState;
 
 fn app(app_state: AppState) -> Router {
     Router::new()
