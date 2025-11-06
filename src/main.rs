@@ -1,23 +1,46 @@
-use axum::{response::Html, routing::get, Router};
+use dotenvy::dotenv;
+use axum::{extract::State, response::Html, routing::get, Router};
 use maud::{html, Markup};
 use tower_http::services::ServeDir;
+use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
+use std::{env, time::Duration};
 
 const PORT_NUM: &str = "0.0.0.0:3000";
 const DATASTAR_SRC: &str = "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js";
 
-fn app() -> Router {
+#[derive(Clone)]
+struct AppState {
+    pool: Pool<Postgres> }
+
+fn app(app_state: AppState) -> Router {
     Router::new()
-        .route("/", get(handler))
-        .nest_service("/static", ServeDir::new("static"))}
+        .route("/", get(handler)) 
+        .nest_service("/static", ServeDir::new("static"))
+        .with_state(app_state) }
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
+    let db_url: String = 
+        env::var("DATABASE_URL")
+        .expect("DATABASE_URL not set");
+    let pool: sqlx::Pool<sqlx::Postgres> = 
+        PgPoolOptions::new()
+        .acquire_timeout(Duration::from_secs(3))
+        .max_connections(5)
+        .connect(&db_url).await.expect("Failed to create Postgres pool");       
+    sqlx::query("SELECT 1")
+        .execute(&pool)
+        .await.expect("Failed to connect to DB");
+    let app_state = AppState { pool: pool.clone() };
     let listener: tokio::net::TcpListener = 
         tokio::net::TcpListener::bind(PORT_NUM).await.unwrap();
-    axum::serve(listener, app()).await.unwrap(); }
+    axum::serve(listener, app(app_state)).await.unwrap(); }
 
-fn greet() -> Markup {
-    html! { h1 class="text-3xl font-bold underline" { "Hello!" } } }
+fn greet(total: i64) -> Markup {
+    html! { 
+        h1 class="text-3xl font-bold underline" { "Hello!" }
+        h2 { (total) } } }
 
 fn explanation() -> Markup {
     html! { p { "This page is rendered within rust." } } }
@@ -42,7 +65,11 @@ fn fido () -> Markup {
                 style="display: none;" {
                     "Save!" } } } }
 
-async fn handler() -> Html<String> {
+async fn handler(State(state): State<AppState>) -> Html<String> {
+    let total: i64 = sqlx::query_scalar("select increment_visit()")
+        .fetch_one(&state.pool)
+        .await
+        .expect("increment_visit failed");
     let markup: Markup = html! {
         html {
             head { 
@@ -50,7 +77,7 @@ async fn handler() -> Html<String> {
                 link rel="stylesheet" href="/static/output.css" {} }
             body {
                 div {
-                    (greet())
+                    (greet(total))
                     (fido())
                     (explanation())
                     (alert_button()) } } } };
