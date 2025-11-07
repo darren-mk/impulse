@@ -10,11 +10,11 @@ use sqlx::{postgres::PgPoolOptions};
 use std::{env, time::Duration};
 use constants::{PORT_NUM};
 use models::AppState;
-use pages::landing::handler;
 
 fn app(app_state: AppState) -> Router {
     Router::new()
-        .route("/", get(handler)) 
+        .route("/", get(pages::landing::handler))
+        .route("/product", get(pages::product::handler)) 
         .nest_service("/static", ServeDir::new("static"))
         .with_state(app_state) }
 
