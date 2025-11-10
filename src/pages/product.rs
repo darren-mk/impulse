@@ -1,5 +1,5 @@
 use maud::{html, Markup};
-use crate::components::layouts::to_html;
+use crate::components::{icons::slash, layouts::to_html};
 use axum::{response::Html};
 
 pub async fn handler() -> Html<String> {
@@ -11,28 +11,22 @@ fn body() -> Markup {
         div class="bg-white" {
           div class="pt-6" {
             nav aria-label="Breadcrumb" {
-              ol role="list" class="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8" {
+              ol role="list" class="mx-auto flex max-w-2xl items-center 
+                                    space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8" {
                 li {
                   div class="flex items-center" {
-                    a href="#" class="mr-2 text-sm font-medium text-gray-900" { "Men" }
-                    svg viewBox="0 0 16 20" width="16" height="20" fill="currentColor" aria-hidden="true" class="h-5 w-4 text-gray-300" {
-                      path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" {};
-                    }
-                  }
-                }
+                    a href="#" 
+                      class="mr-2 text-sm font-medium text-gray-900" { "Men" }
+                    (slash()) } }
                 li {
                   div class="flex items-center" {
-                    a href="#" class="mr-2 text-sm font-medium text-gray-900" { "Clothing" }
-                    svg viewBox="0 0 16 20" width="16" height="20" fill="currentColor" aria-hidden="true" class="h-5 w-4 text-gray-300" {
-                      path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" {};
-                    }
-                  }
-                }
+                    a href="#" 
+                      class="mr-2 text-sm font-medium text-gray-900" { "Clothing" }
+                    (slash()) } }
                 li class="text-sm" {
-                  a href="#" aria-current="page" class="font-medium text-gray-500 hover:text-gray-600" { "Basic Tee 6-Pack" }
-                }
-              }
-            }
+                  a href="#" 
+                    aria-current="page" 
+                    class="font-medium text-gray-500 hover:text-gray-600" { "Basic Tee 6-Pack" } } } }
 
             // Image gallery
             div class="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-8 lg:px-8" {
